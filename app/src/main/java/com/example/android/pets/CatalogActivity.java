@@ -64,6 +64,17 @@ public class CatalogActivity extends AppCompatActivity {
     }
 
     /**
+     * This method is called when activity is restarted
+     * After coming back from EditorActivity, this method will be called
+     */
+    @Override
+    protected void onStart() {
+        super.onStart();
+        // display the Database info
+        displayDatabaseInfo();
+    }
+
+    /**
      * Temporary helper method to display information in the onscreen TextView about the state of
      * the pets database.
      */
