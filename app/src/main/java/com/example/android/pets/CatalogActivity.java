@@ -80,9 +80,6 @@ public class CatalogActivity extends AppCompatActivity {
      */
     private void displayDatabaseInfo() {
 
-        // Create and/or open a database to read from it
-        SQLiteDatabase db = mDbHelper.getReadableDatabase();
-
         // Define a projection that specifies which columns from the database
         // you will actually use after this query.
         String[] projection = {
@@ -95,15 +92,14 @@ public class CatalogActivity extends AppCompatActivity {
 
         // Perform query on the database with all default values
         // to get a Cursor that contains all rows from the pets table.
-        Cursor cursor = db.query(
-                PetEntry.TABLE_NAME,
-                projection,
-                null,
-                null,
-                null,
-                null,
-                null);
+       Cursor cursor = getContentResolver().query(
+               PetEntry.CONTENT_URI, // The content URI of the words table
+               projection,           // The columns to return for each row
+               null,                 // Selection criteria
+               null,                 // Selection criteria
+               null);                // The sort order
 
+        
         // Get the reference for text_view_pet
         TextView displayView = (TextView) findViewById(R.id.text_view_pet);
 
