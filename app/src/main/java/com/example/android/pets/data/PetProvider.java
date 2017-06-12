@@ -134,7 +134,21 @@ public class PetProvider extends ContentProvider {
      */
     @Override
     public int update(Uri uri, ContentValues contentValues, String selection, String[] selectionArgs) {
-        return 0;
+        final int match = sUriMatcher.match(uri);
+        switch (match) {
+            case PETS:
+                return updatePet(contentValues,selection,selectionArgs);
+            case PET_ID:
+                // For the PET_ID code, extract out the ID from the URI
+                // so we know which row to update. Selection will be "_id=?" and
+                // selection arguments will be a string array containing actual ID.
+                selection = "_ID=?";
+                selectionArgs = new String[] {String.valueOf(ContentUris.parseId(uri))};
+                return updatePet(contentValues, selection, selectionArgs);
+            default:
+                throw new IllegalArgumentException("Update pet is not supported for " + uri);
+        }
+
     }
 
     /**
@@ -189,6 +203,38 @@ public class PetProvider extends ContentProvider {
         // Once we know the ID of the new row in the table,
         // return the new URI with the ID appended to the end of it
         return ContentUris.withAppendedId(uri, id);
+    }
+
+    private int updatePet(ContentValues values, String selection, String[] selectionArgs) {
+
+        // If there are no values to update, then don't try to update the database
+        if (values.size() == 0) {
+            return 0;
+        }
+
+        // If the {@link PetEntry#COLUMN_PET_NAME} key is present,
+        // check that the name value is not null.
+        if(values.containsKey(PetEntry.COLUMN_PET_NAME)) {
+            String name = values.getAsString(PetEntry.COLUMN_PET_NAME);
+            if(name == null || TextUtils.isEmpty(name)) {
+                throw new IllegalArgumentException("Pet requires a valid name");
+            }
+        }
+
+        // If the {@link PetEntry#COLUMN_PET_WEIGHT} key is present,
+        // check that the weight value is valid.
+        if(values.containsKey(PetEntry.COLUMN_PET_WEIGHT)) {
+            Integer weight = values.getAsInteger(PetEntry.COLUMN_PET_WEIGHT);
+            if(weight == null || weight<0) {
+                throw new IllegalArgumentException("Pet requires a valid weight");
+            }
+        }
+
+        // Get a writable database
+        SQLiteDatabase database = mDbHelper.getWritableDatabase();
+
+        // Call insert method on database
+        return database.update(PetEntry.TABLE_NAME, values, selection, selectionArgs);
     }
 }
 
