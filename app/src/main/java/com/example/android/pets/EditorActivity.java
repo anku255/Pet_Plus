@@ -16,7 +16,7 @@
 package com.example.android.pets;
 
 import android.content.ContentValues;
-import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
@@ -31,7 +31,6 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.example.android.pets.data.PetContract.PetEntry;
-import com.example.android.pets.data.PetDbHelper;
 
 /**
  * Allows user to create a new pet or edit an existing one.
@@ -56,12 +55,6 @@ public class EditorActivity extends AppCompatActivity {
      */
     private int mGender = PetEntry.GENDER_UNKNOWN;
 
-    /** Instance of PetDbHelper class
-     * Used to open and create database
-     */
-    PetDbHelper mDbHelper;
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -75,8 +68,6 @@ public class EditorActivity extends AppCompatActivity {
 
         setupSpinner();
 
-        // Instantiate mDbHelper by passing this activity as context
-        mDbHelper = new PetDbHelper(this);
     }
 
     /**
@@ -135,20 +126,18 @@ public class EditorActivity extends AppCompatActivity {
         values.put(PetEntry.COLUMN_PET_GENDER,mGender);
         values.put(PetEntry.COLUMN_PET_WEIGHT,weight);
 
-        // Open the database in write mode
-        SQLiteDatabase db = mDbHelper.getWritableDatabase();
+        // Insert a new pet into the provider, returning the content URI for the new pet.
+        Uri newUri = getContentResolver().insert(PetEntry.CONTENT_URI,values);
 
-        // Insert "values" in database
-        long rowId = db.insert(PetEntry.TABLE_NAME,null,values);
 
-        // Check for value of rowId
-        // If its -1 then show a toast with "Error with saving pet" message
-        if(rowId == -1) {
-            Toast.makeText(this, "Error with saving pet", Toast.LENGTH_SHORT).show();
+        // Show a toast message depending on whether or not the insertion was successful
+        if(newUri == null) {
+            // If the new content URI is null, then there was an error with insertion.
+            Toast.makeText(this, getString(R.string.editor_insert_pet_failed), Toast.LENGTH_SHORT).show();
         }
-        // Otherwise display the message "Pet saved with id (row id)"
+        // Otherwise, the insertion was successful and we can display a toast.
         else {
-            Toast.makeText(this, "Pet saved with row id: " + rowId,Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.editor_insert_pet_successful),Toast.LENGTH_SHORT).show();
         }
 
     }

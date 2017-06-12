@@ -18,17 +18,15 @@ package com.example.android.pets;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
-import com.example.android.pets.data.PetDbHelper;
 import com.example.android.pets.data.PetContract.PetEntry;
 
 /**
@@ -37,9 +35,6 @@ import com.example.android.pets.data.PetContract.PetEntry;
 public class CatalogActivity extends AppCompatActivity {
 
     private static final String LOG_TAG = CatalogActivity.class.getSimpleName();
-
-    /** Database helper that will provide us access to the database*/
-    private PetDbHelper mDbHelper;
 
 
     @Override
@@ -56,11 +51,6 @@ public class CatalogActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-
-        // To access our database, we instantiate our subclass of SQLiteOpenHelper
-        // and pass the context, which is current activity.
-        mDbHelper = new PetDbHelper(this);
-        displayDatabaseInfo();
     }
 
     /**
@@ -99,7 +89,7 @@ public class CatalogActivity extends AppCompatActivity {
                null,                 // Selection criteria
                null);                // The sort order
 
-        
+
         // Get the reference for text_view_pet
         TextView displayView = (TextView) findViewById(R.id.text_view_pet);
 
@@ -145,9 +135,6 @@ public class CatalogActivity extends AppCompatActivity {
 
     private void insertPet() {
 
-        // Get the database in write mode
-        SQLiteDatabase db = mDbHelper.getWritableDatabase();
-
         // Create a new map of values, where column name are keys
         ContentValues values = new ContentValues();
         values.put(PetEntry.COLUMN_PET_NAME, "Toto");
@@ -155,11 +142,12 @@ public class CatalogActivity extends AppCompatActivity {
         values.put(PetEntry.COLUMN_PET_GENDER, PetEntry.GENDER_MALE);
         values.put(PetEntry.COLUMN_PET_WEIGHT, 7);
 
-        // Insert the new row, returning the primary key value of new row
-        long newRowId = db.insert(PetEntry.TABLE_NAME,null,values);
+        // Insert the new row for Toto into provider using the ContentResolver.
+        // Use the {@link PetEntry#CONTENT_URI} to indicate that we want to insert
+        // into the pets database table.
+        // Receive the new content URI that will allow us to access  Toto's data in future.
+        Uri NewUri = getContentResolver().insert(PetEntry.CONTENT_URI, values);
 
-        if(newRowId == -1)
-            Log.v(LOG_TAG,"Failed to add a new row");
     }
 
     @Override
