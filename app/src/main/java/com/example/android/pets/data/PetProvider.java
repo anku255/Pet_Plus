@@ -7,6 +7,7 @@ import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.example.android.pets.data.PetContract.PetEntry;
@@ -157,6 +158,23 @@ public class PetProvider extends ContentProvider {
      * for that specific row in the database.
      */
     private Uri insertPet(Uri uri, ContentValues values) {
+
+        // Check that the name is not null
+        String name = values.getAsString(PetEntry.COLUMN_PET_NAME);
+        if(name == null || TextUtils.isEmpty(name)) {
+            throw new IllegalArgumentException("Pet requires a name");
+        }
+
+        //  If the weight is provided, check that it's greater than or equal to 0
+        Integer weight = values.getAsInteger(PetEntry.COLUMN_PET_WEIGHT);
+        if(weight == null || weight<0) {
+            throw new IllegalArgumentException("Pet requires a valid weight");
+        }
+
+        // No need to check the gender as user cannot enter any value other than listed
+        // in spinner
+        // Also there is no need to check breed, any value including null is valid
+
 
         // Get writable database
         SQLiteDatabase database = mDbHelper.getWritableDatabase();

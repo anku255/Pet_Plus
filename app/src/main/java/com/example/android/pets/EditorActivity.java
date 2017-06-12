@@ -115,7 +115,14 @@ public class EditorActivity extends AppCompatActivity {
         // using trim() to eliminate leading and trailing whitespaces
         String nameString = mNameEditText.getText().toString().trim();
         String breedString = mBreedEditText.getText().toString().trim();
-        int weight = Integer.parseInt(mWeightEditText.getText().toString().trim());
+        // Check for valid string before converting weight into an integer
+        String weightString = mWeightEditText.getText().toString().trim();
+        Integer weight;
+        try {
+            weight = Integer.parseInt(weightString);
+        } catch (NumberFormatException e) {
+            weight = null; // Set the weight null if it is not provided
+        }
 
         // Create a ContentValues object where keys are column names and
         // attributes are values from editor
