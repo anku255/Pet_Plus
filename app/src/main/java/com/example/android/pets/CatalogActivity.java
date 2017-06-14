@@ -144,7 +144,7 @@ public class CatalogActivity extends AppCompatActivity implements LoaderManager.
         // Update {@lnk PetCursorAdapter} with this new cursor containing updated pet data
         mCursorAdapter.swapCursor(data);
     }
-    
+
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
         // Callback called when the data needs to be deleted
