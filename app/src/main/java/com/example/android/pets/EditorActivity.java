@@ -151,7 +151,17 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         try {
             weight = Integer.parseInt(weightString);
         } catch (NumberFormatException e) {
-            weight = null; // Set the weight null if it is not provided
+            weight = 0; // Set the weight 0 if it is not provided
+        }
+
+        // Check if this is supposed to be a new pet
+        // and check if all the fields in the editor are blank
+        if (mCurrentPetUri == null &&
+                TextUtils.isEmpty(nameString) && TextUtils.isEmpty(breedString) &&
+                TextUtils.isEmpty(weightString) && mGender == PetEntry.GENDER_UNKNOWN) {
+            // Since no fields were modified, we can return early without creating a new pet.
+            // No need to create ContentValues and no need to do any ContentProvider operations.
+            return;
         }
 
         // Create a ContentValues object where keys are column names and
