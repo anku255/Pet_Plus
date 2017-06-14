@@ -273,10 +273,16 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         switch (item.getItemId()) {
             // Respond to a click on the "Save" menu option
             case R.id.action_save:
-                // Insert the pet into database
-                savePet();
-                // return to last activity
-                finish();
+                // Check if pet name field is empty
+                // Use EditText's setError method to notify user to fill the pet name
+                if(mNameEditText.getText().toString().length() == 0 && !areAllFieldsEmpty()) {
+                    mNameEditText.setError("Pet name is required!");
+                } else {
+                    // Otherwise insert the pet into database
+                    savePet();
+                    // return to last activity
+                    finish();
+                }
                 return true;
             // Respond to a click on the "Delete" menu option
             case R.id.action_delete:
@@ -501,4 +507,23 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         // Close the activity
         finish();
     }
+
+    private boolean areAllFieldsEmpty() {
+
+        String nameString = mNameEditText.getText().toString().trim();
+        String breedString = mBreedEditText.getText().toString().trim();
+        // Check for valid string before converting weight into an integer
+        String weightString = mWeightEditText.getText().toString().trim();
+
+        // Check if all the fields in the editor are blank
+        if (TextUtils.isEmpty(nameString) && TextUtils.isEmpty(breedString) &&
+                TextUtils.isEmpty(weightString) && mGender == PetEntry.GENDER_UNKNOWN) {
+
+            return true;
+        }
+
+        return false;
+    }
+
+
 }
