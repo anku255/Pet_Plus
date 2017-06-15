@@ -275,7 +275,8 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
             case R.id.action_save:
                 // Check if pet name field is empty
                 // Use EditText's setError method to notify user to fill the pet name
-                if(mNameEditText.getText().toString().length() == 0 && !areAllFieldsEmpty()) {
+                String petName = mNameEditText.getText().toString();
+                if(petName.trim().length() == 0 && !areAllFieldsEmpty()) {
                     mNameEditText.setError("Pet name is required!");
                 } else {
                     // Otherwise insert the pet into database
